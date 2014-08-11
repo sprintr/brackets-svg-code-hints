@@ -46,6 +46,9 @@ define(function (require, module, exports) {
 	function SVGCodeHints() {}
 
 	SVGCodeHints.prototype.hasHints = function (editor, implicitChar) {
+		if(!/[<A-Za-z0-9- ]/.test(implicitChar))
+			return false;
+
 		this.editor = editor;
 		this.initialPos = editor.getCursorPos();
 		if (XMLUtils.getXMLTagInfo(this.editor, this.initialPos) !== false) {
