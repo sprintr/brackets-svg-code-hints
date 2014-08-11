@@ -34,12 +34,14 @@ define(function (require, exports, module) {
 
 		// Return Tags.
 		if (offset[0] >= 0 && (offset[1] < offset[0] || offset[1] === -1)) {
+			context.tokenType = _tTAG;
 			if (offset[1] === -1) {
 				offset[1] = textBefore.length;
 			}
 			context.query = textBefore.substr(offset[0] + 1, offset[1]).trim();
-			context.tokenType = _tTAG;
-			return context;
+			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0)
+				return context;
+			return false;
 		}
 
 		// find opening-tag.
@@ -48,7 +50,7 @@ define(function (require, exports, module) {
 			textBefore = editor.document.getRange(initialCur, currentPos).replace(/\s+/g, ' ').trimLeft();
 			offset[0] = textBefore.lastIndexOf("<");
 		}
-		if (offset[0] === -1) return false;
+		if (offset[0] === -1 || !/^[a-z]$/i.test(textBefore.substr(offset[0]+1, 1))) return false;
 
 		// first space after the tag.
 		offset[1] = textBefore.indexOf(' ', offset[0]);
@@ -87,12 +89,15 @@ define(function (require, exports, module) {
 				if (!arg || arg.length === 1) return;
 				context.exclusionList.push(arg.split('=')[0]);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim();
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim().split(' ')[0];
 			context.query = textBefore.substr(offset[3]).trim();
 			if (context.query === context.exclusionList.slice(-1)[0]) {
 				context.exclusionList.pop();
 			}
-			return context;
+			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0) {
+				return context;
+			}
+			return false;
 		}
 
 		if (offset[3] > offset[4]) {
@@ -107,7 +112,7 @@ define(function (require, exports, module) {
 			buffer.split(' ').forEach(function(arg) {
 				context.exclusionList.push(arg);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim();
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim().split(' ')[0];
 			context.attrName = textBefore.substr(offset[3]).slice(1, -2).split('=')[0];
 			context.query = textBefore.substr(offset[4]+2).split(' ').reverse()[0];
 			if (context.query === context.exclusionList.slice(-1)[0]) {
