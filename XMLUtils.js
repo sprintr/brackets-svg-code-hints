@@ -125,7 +125,7 @@ define(function (require, exports, module) {
 
 	// Public API
 	exports.getXMLTagInfo	= getXMLTagInfo;
-    exports._tTAG			= _tTAG;
-    exports._tATTR			= _tATTR;
-    exports._tVALUE			= _tVALUE;
+	exports._tTAG			= _tTAG;
+	exports._tATTR			= _tATTR;
+	exports._tVALUE			= _tVALUE;
 });
