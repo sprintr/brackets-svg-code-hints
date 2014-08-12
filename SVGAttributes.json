@@ -245,6 +245,9 @@
 	"stroke-width": {
 		"attribOptions": ["inherit"]
 	},
+	"style/type": {
+		"attribOptions": ["text/css"]
+	},
 	"text-anchor": {
 		"attribOptions": ["end", "inherit", "middle", "start"]
 	},
