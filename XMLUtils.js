@@ -26,7 +26,7 @@ define(function (require, exports, module) {
 		initialCur = {
 			line: initialPos.line,
 			ch: 0
-		},
+		};
 		finalCur = {
 			line: currentPos.line,
 			ch: editor._codeMirror.lineInfo(currentPos.line).text.length
@@ -38,14 +38,15 @@ define(function (require, exports, module) {
 		offset[1]	= textBefore.lastIndexOf(' ');
 
 		// Return Tags.
-		if (offset[0] >= 0 && (offset[1] < offset[0] || offset[1] === -1)) {
+		if (offset[0] !== -1 && offset[0] > offset[1]) {
 			context.tokenType = _tTAG;
 			if (offset[1] === -1) {
 				offset[1] = textBefore.length;
 			}
-			context.query = textBefore.substr(offset[0] + 1, offset[1]).trim();
-			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0)
+			context.query = textBefore.substr(offset[0] + 1, offset[1]);
+			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0) {
 				return context;
+			}
 			return false;
 		}
 
@@ -65,6 +66,11 @@ define(function (require, exports, module) {
 		while (offset[2] === -1 && finalCur.line <= editor.lineCount() - 1) {
 			finalCur.ch = editor._codeMirror.lineInfo(finalCur.line).text.length;
 			textAfter = editor.document.getRange(currentPos, finalCur).replace(/\s+/g, ' ').trim();
+
+			if (textAfter.indexOf('<') !== -1 && textAfter.indexOf('/>') !== -1 && textAfter.indexOf('<') < textAfter.indexOf('/>')) {
+				offset[2] = textAfter.indexOf('<');
+				break;
+			}
 			if (textAfter.indexOf('/>') !== -1 && textAfter.indexOf('/>') > textAfter.indexOf('<')) {
 				offset[2] = textAfter.indexOf('/>');
 				break;
@@ -79,6 +85,9 @@ define(function (require, exports, module) {
 			}
 			finalCur.line++;
 		}
+		if (textBefore.indexOf('>', offset[0]) !== -1) {
+			return false;
+		}
 		if (textBefore.substr(offset[0], 1) === '<' && textAfter.length === 0) {
 			offset[2] = 0;
 		}
@@ -87,18 +96,19 @@ define(function (require, exports, module) {
 		offset[4] = textBefore.lastIndexOf('="');
 		offset[5] = textBefore.lastIndexOf('"');
 
-		if (offset[2] === -1 && !(offset[4] !== -1 && offset[5] !== -1 && offset[4] > offset[3]))
+		if (offset[2] === -1 && !(offset[4] !== -1 && offset[5] !== -1 && offset[4] > offset[3])) {
 			return false;
+		}
 
 		// Return attributes.
 		if (offset[1] === offset[3] && offset[3] > offset[4] || offset[5]-offset[4] !== 1) {
 			context.tokenType = _tATTR;
-			buffer = [textBefore.substr(offset[0]), textAfter.substr(0, offset[2] + 1)].join(' ');
+			buffer = [textBefore.substr(offset[0]), textAfter.substr(0, offset[2])].join(' ');
 			buffer.split(' ').slice(1).forEach(function (arg) {
 				if (!arg || arg.length === 1) return;
 				context.exclusionList.push(arg.split('=')[0]);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim().split(' ')[0];
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]).split(' ')[0];
 			context.query = textBefore.substr(offset[3]).trim();
 			if (context.query === context.exclusionList.slice(-1)[0]) {
 				context.exclusionList.pop();
@@ -119,11 +129,12 @@ define(function (require, exports, module) {
 			context.tokenType = _tVALUE;
 			buffer = [textBefore.substr(offset[4]+2), textAfter.substr(0, offset[6])].join(' ');
 			buffer.split(' ').forEach(function(arg) {
+				if (!arg) return;
 				context.exclusionList.push(arg);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).trim().split(' ')[0];
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]).split(' ')[0];
 			context.attrName = textBefore.substr(offset[3]).slice(1, -2).split('=')[0];
-			context.query = textBefore.substr(offset[4]+2).split(' ').reverse()[0];
+			context.query = textBefore.substr(offset[4]+2).split(' ').slice(-1)[0];
 			if (context.query === context.exclusionList.slice(-1)[0]) {
 				context.exclusionList.pop();
 			}
