@@ -22,13 +22,18 @@ define(function (require, exports, module) {
 			exclusionList: []
 		};
 		currentPos = currentPos || initialPos;
-		
-		var textBefore, textAfter, buffer, offset = [], inAttr;
-		var initialCur	= { line: initialPos.line, ch: 0 },
-			finalCursor	= { line: currentPos.line, ch: editor._codeMirror.lineInfo(currentPos.line).text.length };
+		var textBefore, textAfter, buffer, offset = [], inAttr, initialCur, finalCur;
+		initialCur = {
+			line: initialPos.line,
+			ch: 0
+		},
+		finalCur = {
+			line: currentPos.line,
+			ch: editor._codeMirror.lineInfo(currentPos.line).text.length
+		};
 
 		textBefore	= editor.document.getRange(initialCur, currentPos).replace(/\s+/g, ' ').trimLeft();
-		textAfter	= editor.document.getRange(currentPos, finalCursor).replace(/\s+/g, ' ').trim();
+		textAfter	= editor.document.getRange(currentPos, finalCur).replace(/\s+/g, ' ').trim();
 		offset[0]	= textBefore.lastIndexOf('<');
 		offset[1]	= textBefore.lastIndexOf(' ');
 
@@ -57,9 +62,13 @@ define(function (require, exports, module) {
 
 		// find closing-tag.
 		offset[2] = -1;
-		while (offset[2] === -1 && finalCursor.line <= editor.lineCount() - 1) {
-			finalCursor.ch = editor._codeMirror.lineInfo(finalCursor.line).text.length;
-			textAfter = editor.document.getRange(currentPos, finalCursor).replace(/\s+/g, ' ').trim();
+		while (offset[2] === -1 && finalCur.line <= editor.lineCount() - 1) {
+			finalCur.ch = editor._codeMirror.lineInfo(finalCur.line).text.length;
+			textAfter = editor.document.getRange(currentPos, finalCur).replace(/\s+/g, ' ').trim();
+			if (textAfter.indexOf('/>') !== -1 && textAfter.indexOf('/>') > textAfter.indexOf('<')) {
+				offset[2] = textAfter.indexOf('/>');
+				break;
+			}
 			if (textAfter.indexOf('>') !== -1 && textAfter.indexOf('>') < textAfter.indexOf('<')) {
 				offset[2] = textAfter.indexOf('>');
 				break;
@@ -68,7 +77,7 @@ define(function (require, exports, module) {
 				offset[2] = textAfter.indexOf('<');
 				break;
 			}
-			finalCursor.line++;
+			finalCur.line++;
 		}
 		if (textBefore.substr(offset[0], 1) === '<' && textAfter.length === 0) {
 			offset[2] = 0;
