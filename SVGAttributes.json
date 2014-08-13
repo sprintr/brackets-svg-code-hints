@@ -119,6 +119,9 @@
 	"glyph-orientation-vertical": {
 		"attribOptions": ["auto", "inherit"]
 	},
+	"gradientTransform": {
+		"alias": "transform"
+	},
 	"gradientUnits": {
 		"attribOptions": ["objectBoundingBox", "userSpaceOnUse"]
 	},
