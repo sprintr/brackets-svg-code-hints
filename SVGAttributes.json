@@ -311,6 +311,18 @@
 	"feComposite/operator": {
 		"attribOptions": ["arithmetic", "atop", "in", "out", "over", "xor"]
 	},
+	"feFuncA/type": {
+		"attribOptions": ["discrete", "gamma", "identity", "linear", "table"]	
+	},
+	"feFuncB/type": {
+		"alias": "feFuncA/type"
+	},
+	"feFuncG/type": {
+		"alias": "feFuncA/type"
+	},
+	"feFuncR/type": {
+		"alias": "feFuncA/type"
+	},
 	"feMorphology/operator": {
 		"attribOptions": ["dilate", "erode"]
 	},

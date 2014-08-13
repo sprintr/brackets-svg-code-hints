@@ -87,8 +87,9 @@ define(function (require, module, exports) {
 			if (!(attributes[context.attrName] || attributes[index]))
 				return false;
 
-			if (attributes[index] && attributes[index].attribOptions) {
-				attributes[index].attribOptions.forEach(function (arg) {
+			if (attributes[index] && attributes[index].attribOptions || attributes[index].alias) {
+				attrs = attributes[index].attribOptions || attributes[attributes[index].alias].attribOptions;
+				attrs.forEach(function (arg) {
 					if (arg.indexOf(context.query) === 0 && context.exclusionList.indexOf(arg) === -1) {
 						hints.push(arg);
 					}
