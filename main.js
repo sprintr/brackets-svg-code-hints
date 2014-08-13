@@ -70,7 +70,7 @@ define(function (require, module, exports) {
 			}
 		}
 		if (context.tokenType === XMLUtils._tATTR) { // attribute
-			if (!tags[context.tagName] && (!tags[context.tagName].attributes || !tags[context.tagName].alias))
+			if (!tags[context.tagName])
 				return false;
 
 			attrs = tags[context.tagName].attributes || tags[tags[context.tagName].alias].attributes;
@@ -82,12 +82,10 @@ define(function (require, module, exports) {
 		}
 		if (context.tokenType === XMLUtils._tVALUE) { // attribute-value
 			var index = context.tagName + '/' + context.attrName;
-			if (!tags[context.tagName] && (!tags[context.tagName].attributes || !tags[context.tagName].alias))
-				return false;
-			if (!(attributes[context.attrName] || attributes[index]))
+			if (!tags[context.tagName] && !(attributes[context.attrName] || attributes[index]))
 				return false;
 
-			if (attributes[index] && attributes[index].attribOptions || attributes[index].alias) {
+			if (attributes[index]) {
 				attrs = attributes[index].attribOptions || attributes[attributes[index].alias].attribOptions;
 				attrs.forEach(function (arg) {
 					if (arg.indexOf(context.query) === 0 && context.exclusionList.indexOf(arg) === -1) {
@@ -95,7 +93,7 @@ define(function (require, module, exports) {
 					}
 				});
 			}
-			if (attributes[context.attrName] && (attributes[context.attrName].attribOptions || attributes[context.attrName].alias)) {
+			if (attributes[context.attrName]) {
 				attrs = attributes[context.attrName].attribOptions || attributes[attributes[context.attrName].alias].attribOptions;
 				attrs.forEach(function (arg) {
 					if (arg.indexOf(context.query) === 0 && context.exclusionList.indexOf(arg) === -1) {
