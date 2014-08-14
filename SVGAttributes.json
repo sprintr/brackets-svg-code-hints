@@ -23,6 +23,9 @@
 	"clip": {
 		"attribOptions": ["auto", "inherit"]
 	},
+	"clipPathUnits": {
+		"alias": "gradientUnits"
+	},
 	"clip-path": {
 		"attribOptions": ["inherit", "none"]
 	},
@@ -170,6 +173,9 @@
 	"method": {
 		"attribOptions": ["align", "stretch"]
 	},
+	"mode": {
+		"attribOptions": ["darken", "lighten", "multiply", "normal", "screen"]
+	},
 	"opacity": {
 		"attribOptions": ["inherit"]
 	},
@@ -183,7 +189,10 @@
 		"attribOptions": ["h", "v"]
 	},
 	"patternContentUnits": {
-		"attribOptions": ["objectBoundingBox", "userSpaceOnUse"]
+		"alias": "gradientUnits"
+	},
+	"patternTransform": {
+		"alias": "transform"
 	},
 	"patternUnits": {
 		"alias": "patternContentUnits"
@@ -334,6 +343,12 @@
 	},
 	"stitchTiles": {
 		"attribOptions": ["noStitch", "stitch"]
+	},
+	"svg/contentScriptType": {
+		"alias": "script/type"
+	},
+	"svg/contentStyleType": {
+		"alias": "style/type"
 	},
 	"svg/xmlns": {
 		"attribOptions": ["http://www.w3.org/2000/svg"]
