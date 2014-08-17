@@ -22,50 +22,41 @@ define(function (require, exports, module) {
 			exclusionList: []
 		};
 		currentPos = currentPos || initialPos;
-		var textBefore, textAfter, buffer, offset = [], inAttr, initialCur, finalCur;
-		initialCur = {
-			line: initialPos.line,
-			ch: 0
-		};
-		finalCur = {
-			line: currentPos.line,
-			ch: editor._codeMirror.lineInfo(currentPos.line).text.length
-		};
+		var textBefore, textAfter, buffer, prevCursor, nextCursor, offset = [];
+		prevCursor = { line: initialPos.line, ch: 0 };
+		nextCursor = { line: initialPos.line, ch: editor._codeMirror.lineInfo(initialPos.line).text.length };
+		textBefore = editor.document.getRange(prevCursor, currentPos).replace(/\s+/g, ' ').trimLeft();
+		textAfter = editor.document.getRange(currentPos, nextCursor).replace(/\s+/g, ' ').trim();
 
-		textBefore	= editor.document.getRange(initialCur, currentPos).replace(/\s+/g, ' ').trimLeft();
-		textAfter	= editor.document.getRange(currentPos, finalCur).replace(/\s+/g, ' ').trim();
-		offset[0]	= textBefore.lastIndexOf('<');
-		offset[1]	= textBefore.lastIndexOf(' ');
+		offset[0] = textBefore.lastIndexOf('<');
+		offset[1] = textBefore.indexOf(' ', offset[0]);
 
-		// Return Tags.
-		if (offset[0] !== -1 && offset[0] > offset[1]) {
+		// Tags
+		if (offset[0] > offset[1]) {
 			context.tokenType = _tTAG;
-			if (offset[1] === -1) {
-				offset[1] = textBefore.length;
-			}
-			context.query = textBefore.substr(offset[0] + 1, offset[1]);
-			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0) {
+			context.query = textBefore.substr(offset[0]+1);
+			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0)
 				return context;
-			}
 			return false;
 		}
 
-		// find opening-tag.
-		while (offset[0] === -1 && initialCur.line !== -1) {
-			initialCur.line--;
-			textBefore = editor.document.getRange(initialCur, currentPos).replace(/\s+/g, ' ').trimLeft();
-			offset[0] = textBefore.lastIndexOf("<");
+		// Find opening tag.
+		while (offset[0] === -1 && prevCursor.line !== -1) {
+			prevCursor.line--;
+			textBefore = editor.document.getRange(prevCursor, currentPos).replace(/\s+/g, ' ').trimLeft();
+			offset[0] = textBefore.lastIndexOf('<');
 		}
-		if (offset[0] === -1 || !/^[a-z]$/i.test(textBefore.substr(offset[0]+1, 1))) return false;
+		if (offset[0] === -1 || !/^[a-z]$/.test(textBefore.charAt(offset[0]+1)))
+			return false;
 
-		// first space after the tag.
+		// First space after the tag.
 		offset[1] = textBefore.indexOf(' ', offset[0]);
 
-		// find closing-tag.
+		// Find closing tag.
 		offset[2] = -1;
-		while (offset[2] === -1 && finalCur.line <= editor.lineCount() - 1) {
-			finalCur.ch = editor._codeMirror.lineInfo(finalCur.line).text.length;
-			textAfter = editor.document.getRange(currentPos, finalCur).replace(/\s+/g, ' ').trim();
+		while (offset[2] === -1 && nextCursor.line <= editor.lineCount() - 1) {
+			nextCursor.ch = editor._codeMirror.lineInfo(nextCursor.line).text.length;
+			textAfter = editor.document.getRange(currentPos, nextCursor).replace(/\s+/g, ' ').trim();
 
 			if (textAfter.indexOf('<') !== -1 && textAfter.indexOf('/>') !== -1 && textAfter.indexOf('<') < textAfter.indexOf('/>')) {
 				offset[2] = textAfter.indexOf('<');
@@ -83,36 +74,32 @@ define(function (require, exports, module) {
 				offset[2] = textAfter.indexOf('<');
 				break;
 			}
-			finalCur.line++;
+			nextCursor.line++;
 		}
-		if (textBefore.indexOf('>', offset[0]) !== -1) {
+
+		if (textBefore.indexOf('>', offset[0]) !== -1)
 			return false;
-		}
-		if (textBefore.substr(offset[0], 1) === '<' && textAfter.length === 0) {
+
+		if (textBefore.charAt(offset[0]) === '<' && textAfter.length === 0)
 			offset[2] = 0;
-		}
 
 		offset[3] = textBefore.lastIndexOf(' ');
 		offset[4] = textBefore.lastIndexOf('="');
 		offset[5] = textBefore.lastIndexOf('"');
 
-		if (offset[2] === -1 && !(offset[4] !== -1 && offset[5] !== -1 && offset[4] > offset[3])) {
+		if (offset[2] === -1 && !(offset[4] !== -1 && offset[5] !== -1 && offset[4] > offset[3]))
 			return false;
-		}
 
-		// Return attributes.
+		// Attributes.
 		if (offset[1] === offset[3] && offset[3] > offset[4] || offset[5]-offset[4] !== 1) {
 			context.tokenType = _tATTR;
-			buffer = [textBefore.substr(offset[0]), textAfter.substr(0, offset[2])].join(' ');
-			buffer.split(' ').slice(1).forEach(function (arg) {
-				if (!arg || arg.length === 1) return;
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]-1);
+			context.query = textBefore.substr(offset[3]+1);
+			buffer = textBefore.substr(offset[0]) +' '+ textAfter.substr(0, offset[2]);
+			buffer.split(' ').slice(1).forEach(function(arg) {
+				if (!arg || arg === context.query) return;
 				context.exclusionList.push(arg.split('=')[0]);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).split(' ')[0];
-			context.query = textBefore.substr(offset[3]).trim();
-			if (context.query === context.exclusionList.slice(-1)[0]) {
-				context.exclusionList.pop();
-			}
 			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0) {
 				return context;
 			}
@@ -124,20 +111,17 @@ define(function (require, exports, module) {
 		}
 		offset[6] = textAfter.indexOf('"');
 
-		// Return attribute-values hints.
+		// Attribute Values.
 		if (offset[3] !== -1 && offset[4] > offset[3]) {
 			context.tokenType = _tVALUE;
-			buffer = [textBefore.substr(offset[4]+2), textAfter.substr(0, offset[6])].join(' ');
+			buffer = textBefore.substr(offset[4]+2) + textAfter.substr(0, offset[6]);
 			buffer.split(' ').forEach(function(arg) {
 				if (!arg) return;
 				context.exclusionList.push(arg);
 			});
-			context.tagName = textBefore.substr(offset[0]+1, offset[1]).split(' ')[0];
-			context.attrName = textBefore.substr(offset[3]).slice(1, -2).split('=')[0];
+			context.tagName = textBefore.substr(offset[0]+1, offset[1]-1);
+			context.attrName = textBefore.substr(offset[3]+1, offset[4]-offset[3]-1);
 			context.query = textBefore.substr(offset[4]+2).split(' ').slice(-1)[0];
-			if (context.query === context.exclusionList.slice(-1)[0]) {
-				context.exclusionList.pop();
-			}
 			return context;
 		}
 		return false;
