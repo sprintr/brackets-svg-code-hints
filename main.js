@@ -122,8 +122,7 @@ define(function (require, module, exports) {
 				this.editor.document.replaceRange(hint, this.initialPos, this.currentPos);
 			}
 			return false;
-		}
-		else if (context.tokenType === XMLUtils._tATTR) {
+		} else if (context.tokenType === XMLUtils._tATTR) {
 			hint = (context.shouldReplace) ? hint : hint + '=""';
 
 			if (!!context.query) {
@@ -142,8 +141,7 @@ define(function (require, module, exports) {
 			}
 			this.editor.setCursorPos(this.initialPos.line, this.currentPos.ch + hint.length - 1);
 			return true;
-		}
-		else if (context.tokenType === XMLUtils._tVALUE) {
+		} else if (context.tokenType === XMLUtils._tVALUE) {
 			if (!!context.query) {
 				hint = hint.substr(context.query.length);
 				this.editor.document.replaceRange(hint, this.currentPos);
