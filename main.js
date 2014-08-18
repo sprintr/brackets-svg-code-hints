@@ -68,8 +68,7 @@ define(function (require, module, exports) {
 					hints.push(i);
 				}
 			}
-		}
-		if (context.tokenType === XMLUtils._tATTR) { // attribute
+		} else if (context.tokenType === XMLUtils._tATTR) { // attribute
 			if (!tags[context.tagName])
 				return false;
 
@@ -79,8 +78,7 @@ define(function (require, module, exports) {
 					hints.push(arg);
 				}
 			});
-		}
-		if (context.tokenType === XMLUtils._tVALUE) { // attribute-value
+		} else if (context.tokenType === XMLUtils._tVALUE) { // attribute-value
 			var index = context.tagName + '/' + context.attrName;
 			if (!tags[context.tagName] && !(attributes[context.attrName] || attributes[index]))
 				return false;
