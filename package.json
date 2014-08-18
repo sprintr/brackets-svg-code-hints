@@ -3,7 +3,7 @@
 	"title": "Brackets SVG Code Hints",
 	"description": "Provides code hints for your SVG documents",
 	"homepage": "https://github.com/sprintr/brackets-svg-code-hints",
-	"version": "1.0.0",
+	"version": "0.4.0",
 	"author": "Amin Ullah Khan <aminullah@outlook.com> (https://github.com/sprintr)",
 	"licence": "MIT",
 	"engines": {
