@@ -46,7 +46,7 @@ define(function (require, module, exports) {
 	function SVGCodeHints() {}
 
 	SVGCodeHints.prototype.hasHints = function (editor, implicitChar) {
-		if(!/[<A-Za-z0-9-\s]/.test(implicitChar))
+		if(!/[<A-Za-z0-9\-\s]/.test(implicitChar))
 			return false;
 
 		this.editor = editor;

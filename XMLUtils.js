@@ -36,7 +36,7 @@ define(function (require, exports, module) {
 		if (offset[0] > offset[1]) {
 			context.tokenType = _tTAG;
 			context.query = textBefore.substr(offset[0]+1);
-			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0)
+			if (/^[a-z][a-z0-9\-]*$/i.test(context.query) || context.query.length === 0)
 				return context;
 			return false;
 		}
@@ -102,7 +102,7 @@ define(function (require, exports, module) {
 				if (!arg || arg === context.query) return;
 				context.exclusionList.push(arg.split('=')[0]);
 			});
-			if (/^[a-z][a-z0-9-]*$/i.test(context.query) || context.query.length === 0) {
+			if (/^[a-z][a-z0-9\-]*$/i.test(context.query) || context.query.length === 0) {
 				return context;
 			}
 			return false;
