@@ -19,7 +19,8 @@ define(function (require, exports, module) {
 			tagName: '',
 			attrName: '',
 			query: '',
-			exclusionList: []
+			exclusionList: [],
+			shouldReplace: false
 		};
 		currentPos = currentPos || initialPos;
 		var textBefore, textAfter, buffer, prevCursor, nextCursor, offset = [];
@@ -95,6 +96,7 @@ define(function (require, exports, module) {
 			context.tokenType = _tATTR;
 			context.tagName = textBefore.substr(offset[0]+1, offset[1]-1);
 			context.query = textBefore.substr(offset[3]+1);
+			context.shouldReplace = textAfter.charAt(0) === '=';
 			buffer = textBefore.substr(offset[0]) +' '+ textAfter.substr(0, offset[2]);
 			buffer.split(' ').slice(1).forEach(function(arg) {
 				if (!arg || arg === context.query) return;
