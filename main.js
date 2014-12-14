@@ -35,14 +35,6 @@ define(function (require, module, exports) {
 		tags,
 		attributes;
 
-	// Define Custom language for CodeHints
-	LanguageManager.defineLanguage("svg", {
-		name: "SVG",
-		mode: "xml",
-		fileExtensions: ["svg"],
-		blockComment: ["<!--", "-->"]
-	});
-
 	function SVGCodeHints() {}
 
 	SVGCodeHints.prototype.hasHints = function (editor, implicitChar) {
