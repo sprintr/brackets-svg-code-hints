@@ -17,22 +17,6 @@ OR
 
 Clone this repository in your extensions directory.
 
-How to Use
-----------
-1. Open an SVG Document.
-2. Select `SVG` from the language selection menu at the status bar.
-
-![Change Language](faq.png)
-
-**OR**
-
-1. Add the following preferences to your `brackets.json` file.
-```json
-	"language.fileExtensions": {
-		"svg": "svg"
-	}
-```
-
 Licence
 -------
 Copyright (c) 2014 Amin Ullah Khan
