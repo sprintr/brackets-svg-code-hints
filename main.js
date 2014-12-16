@@ -28,7 +28,6 @@ define(function (require, module, exports) {
 
 	var AppInit			= brackets.getModule('utils/AppInit'),
 		CodeHintManager	= brackets.getModule('editor/CodeHintManager'),
-		LanguageManager	= brackets.getModule('language/LanguageManager'),
 		XMLUtils		= require('./XMLUtils'),
 		SVGTags			= require('text!SVGTags.json'),
 		SVGAttributes	= require('text!SVGAttributes.json'),
